@@ -1,13 +1,8 @@
 import {filter, fromEvent, map, switchMap, take, takeLast, takeUntil, tap} from 'rxjs'
 
-export interface SwipeResponse {
-  open: boolean
-  event: TouchEvent
-}
-
 export const createEdgeSwipe = (
-  startThreshold: number,
-  endThreshold: number,
+  startThreshold: number = 0.1,
+  endThreshold: number = 0.13,
   preventOthers: boolean = true
 ) =>
   fromEvent<TouchEvent>(document, 'touchstart', {capture: preventOthers}).pipe(
