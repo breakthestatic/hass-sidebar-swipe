@@ -22,3 +22,25 @@ export function shadowQuery(
 
   return currentNode as Element | null
 }
+
+export function lockBody() {
+  Object.assign(document.body.style, {
+    position: 'fixed',
+    left: 0,
+    right: 0,
+    bottom: `${document.documentElement.scrollTop}px`,
+  })
+}
+
+export function unlockBody() {
+  const top = parseInt(document.body.style.bottom)
+
+  Object.assign(document.body.style, {
+    position: '',
+    left: '',
+    right: '',
+    bottom: '',
+  })
+
+  window.scrollTo({top, left: 0, behavior: 'auto'})
+}

@@ -1,13 +1,30 @@
 import {filter, fromEvent, map, switchMap, take, takeLast, takeUntil, tap} from 'rxjs'
+import {lockBody} from './util'
 
-export const createEdgeSwipe = (
-  startThreshold: number = 0.1,
-  endThreshold: number = 0.13,
-  preventOthers: boolean = true
-) =>
+export interface EdgeSwipeConfig {
+  startThreshold: number
+  endThreshold: number
+  preventOthers: boolean
+  lockVerticalScroll: boolean
+}
+
+export interface BackSwipeConfig {
+  threshold: number
+  preventOthers: boolean
+}
+
+export const createEdgeSwipe = ({
+  startThreshold,
+  endThreshold,
+  preventOthers,
+  lockVerticalScroll,
+}: EdgeSwipeConfig) =>
   fromEvent<TouchEvent>(document, 'touchstart', {capture: preventOthers}).pipe(
     filter(({touches: [{pageX}]}) => pageX < window.innerWidth * startThreshold),
-    tap((event) => preventOthers && event.stopPropagation()),
+    tap((event) => {
+      lockVerticalScroll && lockBody()
+      preventOthers && event.stopPropagation()
+    }),
     switchMap(() =>
       fromEvent<TouchEvent>(document, 'touchmove').pipe(
         takeUntil(fromEvent<TouchEvent>(document, 'touchend').pipe(take(1))),
@@ -18,7 +35,7 @@ export const createEdgeSwipe = (
     )
   )
 
-export const createBackSwipe = (threshold: number = 50, preventOthers: boolean = true) =>
+export const createBackSwipe = ({preventOthers, threshold}: BackSwipeConfig) =>
   fromEvent<TouchEvent>(document, 'touchstart').pipe(
     tap((event) => preventOthers && event.stopPropagation()),
     switchMap((touchstart) =>
