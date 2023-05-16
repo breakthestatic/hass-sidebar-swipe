@@ -1,8 +1,11 @@
 // Adapted from https://www.abeautifulsite.net/posts/querying-through-shadow-roots/
 export function shadowQuery(
   selector: string,
-  rootNode: Document | Element = document
-): Element | null {
+  rootNode: Document | Element | null = document
+): HTMLElement | null {
+  // Return early if explicit null passed
+  if (rootNode === null) return null
+
   const selectors = String(selector).split('>>>')
   let currentNode = rootNode
 
@@ -20,27 +23,5 @@ export function shadowQuery(
     return null
   }
 
-  return currentNode as Element | null
-}
-
-export function lockBody() {
-  Object.assign(document.body.style, {
-    position: 'fixed',
-    left: 0,
-    right: 0,
-    bottom: `${document.documentElement.scrollTop}px`,
-  })
-}
-
-export function unlockBody() {
-  const top = parseInt(document.body.style.bottom)
-
-  Object.assign(document.body.style, {
-    position: '',
-    left: '',
-    right: '',
-    bottom: '',
-  })
-
-  window.scrollTo({top, left: 0, behavior: 'auto'})
+  return currentNode as HTMLElement | null
 }
