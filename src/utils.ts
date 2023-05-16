@@ -25,3 +25,7 @@ export function shadowQuery(
 
   return currentNode as HTMLElement | null
 }
+
+export function toPixelValue(value: number): number {
+  return value > 1 ? value : window.innerWidth * value
+}
