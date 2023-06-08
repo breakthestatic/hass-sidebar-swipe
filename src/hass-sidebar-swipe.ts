@@ -5,6 +5,7 @@ import {unlockBody} from './body-lock'
 import {HaPanelLovelace} from './ha-interfaces'
 
 const drawer = shadowQuery('home-assistant >>> home-assistant-main >>> ha-drawer')
+const sidebar = shadowQuery('ha-sidebar', drawer)
 const panel = shadowQuery('ha-panel-lovelace', drawer) as HaPanelLovelace
 
 // Get config and set defaults
@@ -15,36 +16,39 @@ const {
   back_threshold = 50,
   prevent_others = true,
   lock_vertical_scroll = true,
+  check_visibility = true,
 } = panel?.lovelace?.config?.sidebar_swipe || {}
 
-// Sync drawer open state
-const isOpen$ = new BehaviorSubject(false)
+if (!check_visibility || (sidebar && getComputedStyle(sidebar).display !== 'none')) {
+  // Sync drawer open state
+  const isOpen$ = new BehaviorSubject(false)
 
-const backSwipe$ = createBackSwipe({
-  threshold: back_threshold,
-  preventOthers: prevent_others,
-})
-const edgeSwipe$ = createEdgeSwipe({
-  startThreshold: start_threshold,
-  endThreshold: end_threshold,
-  preventOthers: prevent_others,
-  lockVerticalScroll: lock_vertical_scroll,
-})
-
-if (drawer) {
-  new MutationObserver((mutationList: MutationRecord[]) => {
-    isOpen$.next(mutationList[0].oldValue === null)
-  }).observe(drawer, {attributes: true, attributeOldValue: true, attributeFilter: ['open']})
-}
-
-isOpen$
-  .pipe(
-    // Clear existing body lock when mneu closes (regardless of trigger)
-    tap((open) => lock_vertical_scroll && !open && unlockBody()),
-    switchMap((open) => (open ? backSwipe$ : edgeSwipe$))
-  )
-  .subscribe(({open}) => {
-    shadowQuery('home-assistant >>> home-assistant-main')?.dispatchEvent(
-      new CustomEvent('hass-toggle-menu', {detail: {open}})
-    )
+  const backSwipe$ = createBackSwipe({
+    threshold: back_threshold,
+    preventOthers: prevent_others,
   })
+  const edgeSwipe$ = createEdgeSwipe({
+    startThreshold: start_threshold,
+    endThreshold: end_threshold,
+    preventOthers: prevent_others,
+    lockVerticalScroll: lock_vertical_scroll,
+  })
+
+  if (drawer) {
+    new MutationObserver((mutationList: MutationRecord[]) => {
+      isOpen$.next(mutationList[0].oldValue === null)
+    }).observe(drawer, {attributes: true, attributeOldValue: true, attributeFilter: ['open']})
+  }
+
+  isOpen$
+    .pipe(
+      // Clear existing body lock when mneu closes (regardless of trigger)
+      tap((open) => lock_vertical_scroll && !open && unlockBody()),
+      switchMap((open) => (open ? backSwipe$ : edgeSwipe$))
+    )
+    .subscribe(({open}) => {
+      shadowQuery('home-assistant >>> home-assistant-main')?.dispatchEvent(
+        new CustomEvent('hass-toggle-menu', {detail: {open}})
+      )
+    })
+}

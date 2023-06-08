@@ -4,6 +4,7 @@ export interface SidebarSwipeConfig {
   back_threshold?: number
   prevent_others?: boolean
   lock_vertical_scroll?: boolean
+  check_visibility?: boolean
 }
 
 interface Lovelace {

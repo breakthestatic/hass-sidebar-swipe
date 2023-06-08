@@ -1,6 +1,6 @@
 {
   "name": "hass-sidebar-swipe",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "source": "src/hass-sidebar-swipe.ts",
   "modern": "dist/hass-sidebar-swipe.js",
   "browserslist": "> 0.5%, last 2 versions, not dead",
