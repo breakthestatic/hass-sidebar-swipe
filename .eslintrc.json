@@ -11,5 +11,6 @@
   "rules": {
     "prefer-const": "error",
     "ignoreRestSiblings": 0
-  }
+  },
+  "ignorePatterns": ["/dist", "/node_modules"]
 }
