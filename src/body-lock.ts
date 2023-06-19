@@ -31,7 +31,7 @@ export function lockBody() {
 }
 
 export function unlockBody() {
-  const top = Math.abs(parseInt(document.body.style.top))
+  const top = Math.abs(parseInt(document.body.style.top)) || document.documentElement.scrollTop
 
   Object.assign(document.body.style, {
     position: '',
