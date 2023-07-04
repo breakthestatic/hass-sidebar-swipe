@@ -1,17 +1,16 @@
 {
   "name": "hass-sidebar-swipe",
-  "version": "1.0.2",
   "source": "src/hass-sidebar-swipe.ts",
   "modern": "dist/hass-sidebar-swipe.js",
   "browserslist": "> 0.5%, last 2 versions, not dead",
   "devDependencies": {
-    "eslint": "^8.39.0",
+    "eslint": "^8.44.0",
     "parcel": "^2.8.3",
     "prettier": "^2.8.8",
     "rxjs": "^7.8.1"
   },
   "scripts": {
-    "watch": "parcel watch",
+    "watch": "parcel watch --no-hmr",
     "build": "parcel build --no-source-maps"
   },
   "targets": {
