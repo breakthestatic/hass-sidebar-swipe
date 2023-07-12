@@ -21,16 +21,17 @@ export const createEdgeSwipe = ({
   lockVerticalScroll,
 }: EdgeSwipeConfig) =>
   fromEvent<TouchEvent>(document, 'touchstart', {capture: preventOthers}).pipe(
-    filter(({touches: [{pageX}]}) => pageX < toPixelValue(startThreshold)),
+    filter(({touches: [{clientX}]}) => clientX < toPixelValue(startThreshold)),
     tap((event) => {
       lockVerticalScroll && lockBody()
       preventOthers && event.stopPropagation()
     }),
-    switchMap(() =>
+    switchMap(({touches: [{clientY: startingY}]}) =>
       fromEvent<TouchEvent>(document, 'touchend').pipe(
         take(1),
-        filter(({changedTouches: [{clientX}]}) => {
-          const thresholdMet = clientX > toPixelValue(endThreshold)
+        filter(({changedTouches: [{clientX, clientY}]}) => {
+          const thresholdMet =
+            clientX > Math.abs(clientY - startingY) && clientX > toPixelValue(endThreshold)
 
           // Revert body lock state if gesture doesn't complete
           lockVerticalScroll && !thresholdMet && unlockBody()
@@ -45,10 +46,10 @@ export const createEdgeSwipe = ({
 export const createBackSwipe = ({preventOthers, threshold}: BackSwipeConfig) =>
   fromEvent<TouchEvent>(document, 'touchstart').pipe(
     tap((event) => preventOthers && event.stopPropagation()),
-    switchMap(({touches: [{pageX}]}) =>
+    switchMap(({touches: [{clientX: startingX}]}) =>
       fromEvent<TouchEvent>(document, 'touchend').pipe(
         take(1),
-        filter(({changedTouches: [{clientX}]}) => pageX - clientX > toPixelValue(threshold)),
+        filter(({changedTouches: [{clientX}]}) => startingX - clientX > toPixelValue(threshold)),
         map((event) => ({open: false, event}))
       )
     )
