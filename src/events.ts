@@ -33,8 +33,11 @@ export const createEdgeSwipe = ({
       fromEvent<TouchEvent>(document, 'touchmove', {capture: preventOthers}).pipe(
         tap((event) => preventOthers && event?.stopPropagation()),
         takeUntil(
-          fromEvent<TouchEvent>(document, 'touchend').pipe(
-            tap(() => lockVerticalScroll && unlockBody()),
+          fromEvent<TouchEvent>(document, 'touchend', {capture: preventOthers}).pipe(
+            tap((event) => {
+              lockVerticalScroll && unlockBody()
+              preventOthers && event?.stopPropagation()
+            }),
             take(1)
           )
         ),
