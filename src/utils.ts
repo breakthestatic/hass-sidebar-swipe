@@ -29,3 +29,7 @@ export function shadowQuery(
 export function toPixelValue(value: number): number {
   return value > 1 ? value : window.innerWidth * value
 }
+
+export const isExcluded = (event: TouchEvent, exclusions: string[]) =>
+  exclusions.length &&
+  event.composedPath().some((el) => el instanceof Element && el.matches(exclusions.join()))

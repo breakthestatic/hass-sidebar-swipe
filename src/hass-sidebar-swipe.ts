@@ -16,10 +16,10 @@ const {
   back_threshold = 50,
   prevent_others = true,
   lock_vertical_scroll = true,
-  check_visibility = true,
+  exclusions = [],
 } = panel?.lovelace?.config?.sidebar_swipe || {}
 
-if (!check_visibility || (sidebar && getComputedStyle(sidebar).display !== 'none')) {
+if (sidebar && getComputedStyle(sidebar).display !== 'none') {
   // Sync drawer open state
   const isOpen$ = new BehaviorSubject(false)
 
@@ -32,6 +32,7 @@ if (!check_visibility || (sidebar && getComputedStyle(sidebar).display !== 'none
     endThreshold: end_threshold,
     preventOthers: prevent_others,
     lockVerticalScroll: lock_vertical_scroll,
+    exclusions,
   })
 
   if (drawer) {

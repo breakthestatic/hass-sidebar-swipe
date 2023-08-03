@@ -10,6 +10,7 @@
     "rxjs": "^7.8.1"
   },
   "scripts": {
+    "serve": "parcel serve --no-hmr",
     "watch": "parcel watch --no-hmr",
     "build": "parcel build --no-source-maps"
   },
