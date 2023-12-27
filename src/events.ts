@@ -31,6 +31,7 @@ export const createEdgeSwipe = ({
     }),
     switchMap(({touches: [{clientY: startingY}]}) =>
       fromEvent<TouchEvent>(document, 'touchmove', {capture: preventOthers}).pipe(
+        filter(({touches}) => touches.length < 2),
         tap((event) => preventOthers && event?.stopPropagation()),
         takeUntil(
           fromEvent<TouchEvent>(document, 'touchend', {capture: preventOthers}).pipe(
