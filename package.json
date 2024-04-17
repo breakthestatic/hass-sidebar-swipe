@@ -10,7 +10,7 @@
     "rxjs": "^7.8.1"
   },
   "scripts": {
-    "serve": "parcel serve --no-hmr",
+    "serve": "parcel serve",
     "watch": "parcel watch --no-hmr",
     "build": "parcel build --no-source-maps"
   },
@@ -18,6 +18,10 @@
     "modern": {
       "outputFormat": "global",
       "optimize": true,
+      "includeNodeModules": true
+    },
+    "demo": {
+      "source": "src/demo.html",
       "includeNodeModules": true
     }
   }

@@ -1,7 +1,6 @@
-import {BehaviorSubject, switchMap, tap} from 'rxjs'
+import {BehaviorSubject, map, switchMap, tap} from 'rxjs'
 import {createBackSwipe, createEdgeSwipe} from './events'
 import {shadowQuery} from './utils'
-import {unlockBody} from './body-lock'
 import {HaPanelLovelace} from './ha-interfaces'
 
 const drawer = shadowQuery('home-assistant >>> home-assistant-main >>> ha-drawer')
@@ -27,6 +26,7 @@ if (sidebar && getComputedStyle(sidebar).display !== 'none') {
     threshold: back_threshold,
     preventOthers: prevent_others,
   })
+
   const edgeSwipe$ = createEdgeSwipe({
     startThreshold: start_threshold,
     endThreshold: end_threshold,
@@ -43,11 +43,11 @@ if (sidebar && getComputedStyle(sidebar).display !== 'none') {
 
   isOpen$
     .pipe(
-      // Clear existing body lock when mneu closes (regardless of trigger)
-      tap((open) => lock_vertical_scroll && !open && unlockBody()),
-      switchMap((open) => (open ? backSwipe$ : edgeSwipe$))
+      switchMap((open) =>
+        open ? backSwipe$.pipe(map(() => false)) : edgeSwipe$.pipe(map(() => true))
+      )
     )
-    .subscribe(({open}) => {
+    .subscribe((open: boolean) => {
       shadowQuery('home-assistant >>> home-assistant-main')?.dispatchEvent(
         new CustomEvent('hass-toggle-menu', {detail: {open}})
       )

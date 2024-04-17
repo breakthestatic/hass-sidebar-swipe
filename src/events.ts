@@ -39,13 +39,12 @@ export const createEdgeSwipe = ({
               lockVerticalScroll && unlockBody()
               preventOthers && event?.stopPropagation()
             }),
-            take(1)
+            map(({changedTouches: [{clientX, clientY}]}) => ({x: clientX, y: clientY})),
+            take(1),
+            filter(({x, y}) => x > Math.abs(y - startingY) && x > toPixelValue(endThreshold))
           )
         ),
-        map(({changedTouches: [{clientX, clientY}]}) => ({x: clientX, y: clientY})),
-        filter(({x, y}) => x > Math.abs(y - startingY) && x > toPixelValue(endThreshold)),
-        takeLast(1),
-        map((event) => ({open: true, event}))
+        takeLast(1)
       )
     )
   )
@@ -55,9 +54,8 @@ export const createBackSwipe = ({preventOthers, threshold}: BackSwipeConfig) =>
     tap((event) => preventOthers && event.stopPropagation()),
     switchMap(({touches: [{clientX: startingX}]}) =>
       fromEvent<TouchEvent>(document, 'touchend').pipe(
-        take(1),
         filter(({changedTouches: [{clientX}]}) => startingX - clientX > toPixelValue(threshold)),
-        map((event) => ({open: false, event}))
+        take(1)
       )
     )
   )

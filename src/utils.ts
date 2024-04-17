@@ -1,19 +1,18 @@
+type Node = Document | Element | null
+
 // Adapted from https://www.abeautifulsite.net/posts/querying-through-shadow-roots/
-export function shadowQuery(
-  selector: string,
-  rootNode: Document | Element | null = document
-): HTMLElement | null {
+export function shadowQuery(selector: string, rootNode: Node = document): HTMLElement | null {
   // Return early if explicit null passed
   if (rootNode === null) return null
 
   const selectors = String(selector).split('>>>')
-  let currentNode = rootNode
+  let currentNode: Node = rootNode
 
   selectors.find((_, index) => {
     if (index === 0) {
-      currentNode = rootNode.querySelector(selectors[index]) as Element
+      currentNode = rootNode.querySelector(selectors[index])
     } else if (currentNode instanceof Element) {
-      currentNode = currentNode?.shadowRoot?.querySelector(selectors[index]) as Element
+      currentNode = (currentNode?.shadowRoot ?? currentNode).querySelector(selectors[index])
     }
 
     return currentNode === null

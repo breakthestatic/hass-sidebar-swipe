@@ -3,5 +3,7 @@
   "bracketSpacing": false,
   "printWidth": 100,
   "singleQuote": true,
-  "arrowParens": "always"
+  "arrowParens": "always",
+  "bracketSameLine": true,
+  "htmlWhitespaceSensitivity": "ignore"
 }
