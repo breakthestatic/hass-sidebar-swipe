@@ -39,12 +39,12 @@ export const createEdgeSwipe = ({
               lockVerticalScroll && unlockBody()
               preventOthers && event?.stopPropagation()
             }),
-            map(({changedTouches: [{clientX, clientY}]}) => ({x: clientX, y: clientY})),
-            take(1),
-            filter(({x, y}) => x > Math.abs(y - startingY) && x > toPixelValue(endThreshold))
+            take(1)
           )
         ),
-        takeLast(1)
+        takeLast(1),
+        map(({changedTouches: [{clientX, clientY}]}) => ({x: clientX, y: clientY})),
+        filter(({x, y}) => x > Math.abs(y - startingY) && x > toPixelValue(endThreshold))
       )
     )
   )
