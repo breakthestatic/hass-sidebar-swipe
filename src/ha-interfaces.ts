@@ -5,6 +5,7 @@ export interface SidebarSwipeConfig {
   prevent_others?: boolean
   lock_vertical_scroll?: boolean
   exclusions?: string[]
+  invert?: boolean
 }
 
 interface Lovelace {

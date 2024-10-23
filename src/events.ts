@@ -8,11 +8,13 @@ export interface EdgeSwipeConfig {
   preventOthers: boolean
   lockVerticalScroll: boolean
   exclusions: string[]
+  invert: 1 | -1
 }
 
 export interface BackSwipeConfig {
   threshold: number
   preventOthers: boolean
+  invert: 1 | -1
 }
 
 export const createEdgeSwipe = ({
@@ -21,15 +23,17 @@ export const createEdgeSwipe = ({
   preventOthers,
   lockVerticalScroll,
   exclusions,
+  invert,
 }: EdgeSwipeConfig) =>
   fromEvent<TouchEvent>(document, 'touchstart', {capture: preventOthers}).pipe(
     filter((event) => !isExcluded(event, exclusions)),
-    filter(({touches: [{clientX}]}) => clientX < toPixelValue(startThreshold)),
-    tap((event) => {
+    map((event) => ({x: event.touches[0].clientX, y: event.touches[0].clientY, event})),
+    filter(({x}) => (x - (innerWidth * (1 - invert)) / 2) * invert < toPixelValue(startThreshold)),
+    tap(({event}) => {
       lockVerticalScroll && lockBody()
       preventOthers && event.stopPropagation()
     }),
-    switchMap(({touches: [{clientY: startingY}]}) =>
+    switchMap(({x: startingX, y: startingY}) =>
       fromEvent<TouchEvent>(document, 'touchmove', {capture: preventOthers}).pipe(
         filter(({touches}) => touches.length < 2),
         tap((event) => preventOthers && event?.stopPropagation()),
@@ -44,17 +48,24 @@ export const createEdgeSwipe = ({
         ),
         takeLast(1),
         map(({changedTouches: [{clientX, clientY}]}) => ({x: clientX, y: clientY})),
-        filter(({x, y}) => x > Math.abs(y - startingY) && x > toPixelValue(endThreshold))
+        // Horizontal swipes only
+        filter(({x, y}) => Math.abs(x - startingX) > Math.abs(y - startingY)),
+        // Reaches end threshold from either direction (based on inverted value)
+        filter(({x}) => (x - (innerWidth * (1 - invert)) / 2) * invert > toPixelValue(endThreshold))
       )
     )
   )
 
-export const createBackSwipe = ({preventOthers, threshold}: BackSwipeConfig) =>
+export const createBackSwipe = ({preventOthers, threshold, invert}: BackSwipeConfig) =>
   fromEvent<TouchEvent>(document, 'touchstart').pipe(
     tap((event) => preventOthers && event.stopPropagation()),
-    switchMap(({touches: [{clientX: startingX}]}) =>
+    switchMap(({touches: [{clientX: startingX, clientY: startingY}]}) =>
       fromEvent<TouchEvent>(document, 'touchend').pipe(
-        filter(({changedTouches: [{clientX}]}) => startingX - clientX > toPixelValue(threshold)),
+        map(({changedTouches: [{clientX, clientY}]}) => ({x: clientX, y: clientY})),
+        // Horizontal swipes only
+        filter(({x, y}) => Math.abs(x - startingX) > Math.abs(y - startingY)),
+        // Touch delta is greater than threshold amount (accounting for direction based on invert prop)
+        filter(({x}) => (startingX - x) * invert > toPixelValue(threshold)),
         take(1)
       )
     )

@@ -16,6 +16,7 @@ const {
   prevent_others = true,
   lock_vertical_scroll = true,
   exclusions = [],
+  invert = false,
 } = panel?.lovelace?.config?.sidebar_swipe || {}
 
 if (sidebar && getComputedStyle(sidebar).display !== 'none') {
@@ -25,6 +26,7 @@ if (sidebar && getComputedStyle(sidebar).display !== 'none') {
   const backSwipe$ = createBackSwipe({
     threshold: back_threshold,
     preventOthers: prevent_others,
+    invert: invert ? -1 : 1,
   })
 
   const edgeSwipe$ = createEdgeSwipe({
@@ -33,6 +35,7 @@ if (sidebar && getComputedStyle(sidebar).display !== 'none') {
     preventOthers: prevent_others,
     lockVerticalScroll: lock_vertical_scroll,
     exclusions,
+    invert: invert ? -1 : 1,
   })
 
   if (drawer) {

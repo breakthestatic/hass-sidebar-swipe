@@ -25,6 +25,9 @@
         transform: translateX(-100%);
         transition: transform 0.3s ease;
       }
+      html[dir='rtl'] ha-drawer:not([open]) {
+        transform: translateX(100%);
+      }
       ha-drawer[open] {
         transform: translateX(0);
       }
@@ -54,6 +57,9 @@
         text-align: center;
         line-height: calc(100vw * 0.1);
       }
+      html[dir='rtl'] .start-threshold {
+        right: 0;
+      }
       .end-threshold {
         position: absolute;
         left: 13%;
@@ -63,6 +69,11 @@
         border-left: 1px solid #000;
         text-align: center;
       }
+      html[dir='rtl'] .end-threshold {
+        right: 13%;
+        border-right: 1px solid #000;
+        border-left: none;
+      }
     </style>
   </head>
   <body>
@@ -71,12 +82,20 @@
         <button id="menu">☰</button>
         <div class="start-threshold">Start Threshold</div>
         <div class="end-threshold">End Threshold</div>
+
         <ha-drawer>
+          <ha-panel-lovelace></ha-panel-lovelace>
           <ha-sidebar />
         </ha-drawer>
       </home-assistant-main>
     </home-assistant>
     <script>
+      const invert = new URLSearchParams(window.location.search).has('invert')
+
+      if (invert) {
+        document.documentElement.setAttribute('dir', 'rtl')
+      }
+
       document
         .querySelector('home-assistant-main')
         .addEventListener('hass-toggle-menu', ({detail: {open}}) => {
@@ -91,6 +110,13 @@
         event.stopPropagation()
         document.querySelector('ha-drawer').setAttribute('open', true)
       })
+      document.querySelector('ha-panel-lovelace').lovelace = {
+        config: {
+          sidebar_swipe: {
+            invert,
+          },
+        },
+      }
     </script>
   </body>
 </html>
