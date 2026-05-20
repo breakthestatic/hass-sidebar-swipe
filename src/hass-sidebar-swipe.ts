@@ -15,6 +15,7 @@ const {
   back_threshold = 50,
   prevent_others = true,
   lock_vertical_scroll = true,
+  prevent_back_navigation = false,
   exclusions = [],
 } = panel?.lovelace?.config?.sidebar_swipe || {}
 
@@ -52,4 +53,18 @@ if (sidebar && getComputedStyle(sidebar).display !== 'none') {
         new CustomEvent('hass-toggle-menu', {detail: {open}})
       )
     })
+
+  // Handle OS-level back button to close drawer instead of navigating
+  if (prevent_back_navigation) {
+    window.addEventListener('popstate', (event) => {
+      if (isOpen$.value) {
+        // Close the drawer instead of navigating
+        shadowQuery('home-assistant >>> home-assistant-main')?.dispatchEvent(
+          new CustomEvent('hass-toggle-menu', {detail: {open: false}})
+        )
+        // Restore history entry to prevent actual navigation
+        window.history.pushState(null, '')
+      }
+    })
+  }
 }
